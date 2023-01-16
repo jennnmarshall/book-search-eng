@@ -11,60 +11,52 @@ const resolvers = {
         );
         return userData;
       }
-      throw new AuthenticationError("You need to log in.");
+      throw new AuthenticationError("You need to be logged in!");
     },
   },
 
   Mutation: {
+    addUser: async (parent, { username, email, password }) => {
+      const user = await User.create({ username, email, password });
+      return { token, user };
+    },
     login: async (parent, { email, password }) => {
       const user = await User.findOne({ email });
+
       if (!user) {
-        throw new AuthenticationError("Incorrect credentials");
+        throw new AuthenticationError("No user with this email found!");
       }
-      const correctPassword = await user.isCorrectPassword(password);
-      if (!correctPassword) {
-        throw new AuthenticationError("Incorrect credentials");
+
+      const correctPw = await user.isCorrectPassword(password);
+
+      if (!correctPw) {
+        throw new AuthenticationError("Incorrect password!");
       }
+
       const token = signToken(user);
       return { token, user };
     },
-
-    addUser: async (parent, args) => {
-      const createdUser = User.create(args);
-      const token = signToken(createdUser);
-      return { createdUser, token };
-    },
-
-    saveBook: async (parent, { bookData }, context) => {
+    saveBook: async (parent, { newBook }, context) => {
       if (context.user) {
-        const savedBook = await User.findOneAndUpdate(
+        const updatedUser = await User.findByIdAndUpdate(
           { _id: context.user._id },
-          {
-            $push: { savedBooks: bookData },
-          },
-          {
-            new: true,
-          }
+          { $push: { savedBooks: newBook } },
+          { new: true }
         );
-        return savedBook;
+        return updatedUser;
       }
-      throw new AuthenticationError("Incorrect credentials");
+      throw new AuthenticationError("You need to be logged in!");
     },
-
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        return await User.findOneAndUpdate(
+        const updatedUser = await User.findByIdAndUpdate(
           { _id: context.user._id },
-          {
-            $pull: { savedBooks: bookId },
-          },
-          {
-            new: true,
-            runValidators: true,
-          }
+          { $pull: { savedBooks: { bookId } } },
+          { new: true }
         );
+        return updatedUser;
       }
-      throw new AuthenticationError("Incorrect credentials");
+      throw new AuthenticationError("You need to be logged in!");
     },
   },
 };
