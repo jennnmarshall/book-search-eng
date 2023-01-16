@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@mapbox/node-pre-gyp": "^1.0.10",
-    "apollo-client": "^2.6.10",
-    "graphql": "^15.8.0"
+    "apollo-client": "^2.6.10"
   }
 }
