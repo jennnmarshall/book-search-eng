@@ -57,6 +57,7 @@ const SignupForm = () => {
       //   setShowAlert(true);
       // }
 
+      // same as loginform, login with adduser, grab values from mutation
       Auth.login(data.addUser.token);
     } catch (err) {
       console.error(err);

@@ -41,6 +41,7 @@ const LoginForm = () => {
       const { data } = await login({
         variables: { ...userFormData },
       });
+      // grab keys from mutation
       Auth.login(data.login.token);
     } catch (err) {
       console.error(err);
